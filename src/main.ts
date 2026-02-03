@@ -1,8 +1,13 @@
+import './instrument';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as Sentry from "@sentry/nestjs";
+
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -71,5 +76,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Aplicação rodando em: http://localhost:${process.env.PORT ?? 3000}`);
   console.log(`Documentação Swagger disponível em: http://localhost:${process.env.PORT ?? 3000}/api/docs`);
+
+  Sentry.logger.info('User triggered test log', { action: 'test_log' })
 }
 bootstrap();

@@ -13,7 +13,7 @@ import {
   Res,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiParam, ApiSecurity } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { UrlsService } from '../service/urls.service';
 import { CreateUrlDto } from '../dto/create-url.dto';
@@ -21,6 +21,7 @@ import { UpdateUrlDto } from '../dto/update-url.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
 import { User } from '../../entities/users/users.entity';
+import * as Sentry from '@sentry/nestjs';
 
 @ApiTags('URL')
 @Controller()
@@ -62,7 +63,34 @@ export class UrlsController {
   })
   async createShortUrl(@Body() createUrlDto: CreateUrlDto, @Req() req: any) {
     const userId = req.user?.id;
-    return this.urlsService.createShortUrl(createUrlDto, userId);
+
+    Sentry.logger.info('Controller: Create short URL request received', {
+      url: createUrlDto.url,
+      customAlias: createUrlDto.customAlias,
+      userId: userId || 'anonymous',
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
+    try {
+      const result = await this.urlsService.createShortUrl(createUrlDto, userId);
+
+      Sentry.logger.info('Controller: Short URL created successfully', {
+        urlId: result.id,
+        slug: result.slug,
+        userId: userId || 'anonymous',
+      });
+
+      return result;
+    } catch (error) {
+      Sentry.logger.error('Controller: Failed to create short URL', {
+        url: createUrlDto.url,
+        customAlias: createUrlDto.customAlias,
+        userId: userId || 'anonymous',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 
   @Get('my-urls')
@@ -100,7 +128,27 @@ export class UrlsController {
     }
   })
   async getMyUrls(@GetUser() user: User) {
-    return this.urlsService.findMyUrls(user.id);
+    Sentry.logger.info('Controller: Get my URLs request', {
+      userId: user.id,
+      email: user.email,
+    });
+
+    try {
+      const urls = await this.urlsService.findMyUrls(user.id);
+
+      Sentry.logger.info('Controller: URLs retrieved successfully', {
+        userId: user.id,
+        count: urls.length,
+      });
+
+      return urls;
+    } catch (error) {
+      Sentry.logger.error('Controller: Failed to retrieve URLs', {
+        userId: user.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 
   @Put('my-urls/:id')
@@ -161,7 +209,30 @@ export class UrlsController {
     @Body() updateUrlDto: UpdateUrlDto,
     @GetUser() user: User,
   ) {
-    return this.urlsService.updateUrl(id, updateUrlDto, user.id);
+    Sentry.logger.info('Controller: Update URL request', {
+      urlId: id,
+      userId: user.id,
+      newUrl: updateUrlDto.url,
+    });
+
+    try {
+      const result = await this.urlsService.updateUrl(id, updateUrlDto, user.id);
+
+      Sentry.logger.info('Controller: URL updated successfully', {
+        urlId: id,
+        userId: user.id,
+        slug: result.slug,
+      });
+
+      return result;
+    } catch (error) {
+      Sentry.logger.error('Controller: Failed to update URL', {
+        urlId: id,
+        userId: user.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 
   @Delete('my-urls/:id')
@@ -197,7 +268,28 @@ export class UrlsController {
     @Param('id', ParseUUIDPipe) id: string,
     @GetUser() user: User,
   ) {
-    return this.urlsService.deleteUrl(id, user.id);
+    Sentry.logger.info('Controller: Delete URL request', {
+      urlId: id,
+      userId: user.id,
+    });
+
+    try {
+      await this.urlsService.deleteUrl(id, user.id);
+
+      Sentry.logger.info('Controller: URL deleted successfully', {
+        urlId: id,
+        userId: user.id,
+      });
+
+      Sentry.metrics.count('url_deleted', 1);
+    } catch (error) {
+      Sentry.logger.error('Controller: Failed to delete URL', {
+        urlId: id,
+        userId: user.id,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 
   @Get(':slug')
@@ -226,7 +318,26 @@ export class UrlsController {
     }
   })
   async redirectToUrl(@Param('slug') slug: string, @Res() res: Response) {
-    const originalUrl = await this.urlsService.redirectToOriginalUrl(slug);
-    return res.redirect(302, originalUrl);
+    Sentry.logger.debug('Controller: Redirect request received', {
+      slug,
+      timestamp: new Date().toISOString(),
+    });
+
+    try {
+      const originalUrl = await this.urlsService.redirectToOriginalUrl(slug);
+
+      Sentry.logger.info('Controller: Redirecting to original URL', {
+        slug,
+        originalUrl,
+      });
+
+      return res.redirect(302, originalUrl);
+    } catch (error) {
+      Sentry.logger.warn('Controller: Redirect failed', {
+        slug,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
   }
 }

@@ -5,9 +5,13 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { UrlsModule } from './urls/urls.module';
 import { OptionalJwtMiddleware } from './auth/middleware/optional-jwt.middleware';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
+import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     UsersModule,
@@ -15,7 +19,12 @@ import { OptionalJwtMiddleware } from './auth/middleware/optional-jwt.middleware
     UrlsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
