@@ -1,6 +1,12 @@
 import { IsUrl, MaxLength, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUrlDto {
+  @ApiProperty({
+    description: 'Nova URL original (deve começar com http:// ou https://)',
+    example: 'https://www.exemplo.com.br/nova-pagina',
+    maxLength: 2048,
+  })
   @IsNotEmpty({ message: 'URL original não pode estar vazia' })
   @IsUrl(
     {
