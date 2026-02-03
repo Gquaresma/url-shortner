@@ -1,0 +1,72 @@
+version: '3.8'
+
+name: 'url-shortner-api-dev'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: url-shortener-db-dev
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=shorturl
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg-data-dev:/var/lib/postgresql/data 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shorturl"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - url-shortener-network
+
+  # NestJS Application (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: url-shortener-app-dev
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      # Database
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=shorturl
+      # Application
+      - NODE_ENV=development
+      - PORT=3000
+      - BASE_URL=http://localhost:3000
+      # JWT
+      - JWT_SECRET=dev-secret-key-not-for-production
+      - JWT_EXPIRATION=24h
+      # Sentry
+      - SENTRY_DSN=https://1f81baf801b9d8f03d67bc41b6b09bcf@o4510823053787136.ingest.us.sentry.io/4510823055425536
+      - SENTRY_ENVIRONMENT=development
+      - SENTRY_TRACES_SAMPLE_RATE=1.0
+      - SENTRY_PROFILES_SAMPLE_RATE=1.0
+      - SENTRY_ENABLED=true
+    volumes:
+      - ./src:/app/src
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - url-shortener-network
+
+networks:
+  url-shortener-network:
+    driver: bridge
+
+volumes:
+  pg-data-dev:
