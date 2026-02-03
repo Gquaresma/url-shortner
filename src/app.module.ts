@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { UrlsModule } from './urls/urls.module';
+import { OptionalJwtMiddleware } from './auth/middleware/optional-jwt.middleware';
 
 @Module({
   imports: [
@@ -10,8 +12,15 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    UrlsModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(OptionalJwtMiddleware)
+      .forRoutes('shorten');
+  }
+}
