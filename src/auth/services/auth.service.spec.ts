@@ -9,6 +9,9 @@ import { User } from '../../entities/users/users.entity';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { LoginUserDto } from '../../users/dto/login-user.dto';
 
+// Mock do módulo bcrypt
+jest.mock('bcrypt');
+
 describe('AuthService', () => {
   let service: AuthService;
   let userRepository: Repository<User>;
@@ -73,8 +76,8 @@ describe('AuthService', () => {
       mockUserRepository.save.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue('jwt-token');
 
-      jest.spyOn(bcrypt, 'genSalt').mockResolvedValue('salt' as never);
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as never);
+      (bcrypt.genSalt as jest.Mock).mockResolvedValue('salt');
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
 
       const result = await service.register(createUserDto);
 
@@ -108,7 +111,8 @@ describe('AuthService', () => {
     it('should successfully login a user with valid credentials', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue('jwt-token');
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.login(loginUserDto);
 
@@ -131,7 +135,8 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException if password is invalid', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(service.login(loginUserDto)).rejects.toThrow(
         UnauthorizedException,
