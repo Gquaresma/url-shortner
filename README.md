@@ -1,98 +1,144 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# URL Shortener API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API RESTful para encurtamento de URLs construída com **NestJS**, **TypeScript**, **PostgreSQL** e **Docker**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+# URL Shortener — Como executar e Escalabilidade
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+## Como rodar a aplicação
+
+
+Antes de tudo, clone o repositório e entre na pasta do projeto:
 
 ```bash
-$ npm install
+git clone https://github.com/Gquaresma/url-shortner.git
+cd url-shortner
 ```
 
-## Compile and run the project
+Pré-requisitos mínimos:
+
+
+Opção A — Com Docker (recomendado)
+
+1. Copie o arquivo de ambiente:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+2. Suba os containers:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose -f docker-compose.dev.yml up -d --build
 ```
 
-## Deployment
+3. Acesse a API em http://localhost:3000 e Swagger em http://localhost:3000/docs
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+> Para testar rapidamente o funcionamento da aplicação basta abrir o Swagger (`http://localhost:3000/docs`) — ele lista todos os endpoints e permite executar requests diretamente.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Parar e remover containers
+
+Se quiser derrubar os containers criados pelo compose use:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose -f docker-compose.dev.yml down
+```
+Opção B — Sem Docker
+
+1. Instale dependências:
+
+```bash
+npm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+2. Crie o banco PostgreSQL (ex.: usando psql):
 
-## Resources
+```sql
+CREATE DATABASE shorturl;
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+3. Copie variáveis de ambiente:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+cp .env.example .env
+```
 
-## Support
+4. Rode a aplicação em modo de desenvolvimento:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run start:dev
+```
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Escalabilidade em produção (horizontal e vertical)
 
-## License
+Objetivo
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Manter baixa latência e alta disponibilidade para dois padrões principais de carga:
+- Leituras massivas: redirecionamentos (hot path)
+- Escritas esporádicas/picos: criação/atualização de URLs
+
+1) Escala horizontal (recomendada)
+
+- Deploy em orquestrador (Kubernetes / ECS) com várias réplicas da API atrás de um Load Balancer (NGINX / ALB / Cloud LB).
+- Manter a API stateless (JWT) para que qualquer réplica responda às requisições.
+- Autoscaling: HPA baseado em CPU, latência, ou métricas customizadas (por exemplo, filas ou uso de CPU por worker).
+- Infra de suporte: Redis (cache, rate-limit), fila (BullMQ / RabbitMQ / SQS), connection pooler (PgBouncer).
+
+Vantagens
+- Elasticidade, tolerância a falhas, manutenção de disponibilidade durante deploys.
+
+Riscos e mitigação
+- Estado distribuído (contadores/locks): usar Redis com flush em batch para o DB.
+- Explosão de conexões ao Postgres: usar PgBouncer; limitar conexões por pod.
+
+2) Escala vertical
+
+- Aumentar CPU/Memória do banco ou nós de aplicação.
+- Adequado para picos curtos ou quando o custo de rearquitetura horizontal não é justificável imediatamente.
+
+Limitações
+- Fronteiras físicas, custo crescente, não resolve single-point-of-failure.
+
+3) Banco de dados (Postgres)
+
+- Arquitetura sugerida: Primary (writes) + Read Replicas (reads).
+- Usar PgBouncer/Pooler para evitar exaustão de conexões em ambientes com muitas réplicas.
+- Estratégias avançadas: particionamento (partitioning/sharding) quando a base crescer muito.
+
+Pontos críticos e soluções práticas
+- Contadores de acesso de alta taxa: manter contagem em Redis e realizar batch upserts periódicos (p.ex. via worker) ao Postgres.
+- Unicidade de slugs: ter constraint UNIQUE no DB e gerar slugs de forma atômica (Redis INCR + base62, ou sequência no DB com retry). Sempre tratar erros de colisão com retry idempotente.
+
+4) Cache e rate limiting
+
+- Cachear redirecionamentos e metadados em Redis (ou CDN para conteúdo muito estático) com TTLs curtos/medianos.
+- Rate limiting distribuído implementado em Redis para proteger contra abuso e DDoS.
+
+5) Filas e workers
+
+- Offload: envio de e-mails, processamento de métricas, flush de contadores e tarefas de I/O pesado.
+- Filas escaláveis (RabbitMQ / SQS) com workers separadas que escalam independentemente da API.
+
+6) Observabilidade e resiliência
+
+- Health checks (readiness/liveness) para orquestradores.
+- Métricas (Prometheus), logs estruturados e tracing (OpenTelemetry).
+- Circuit breakers, timeouts e retry policy em chamadas externas.
+
+Checklist operacional para promover ao ambiente de produção
+
+- Usar serviços gerenciados (Managed Postgres, Managed Redis) quando possível.
+- Configurar backups automáticos e testes de restore.
+- Implementar CI/CD com pipelines
+- Habilitar monitoramento e alertas (latência, erros, filas, uso de conexões DB).
+- Configurar secrets management e políticas de acesso.
+
+Diagrama da atual arquitetura
+
+![Diagrama da arquitetura](docs/architecture.png)
+
+
