@@ -9,12 +9,13 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { SlugGenerator } from '../helpers/slug-generator.helper';
+import { SlugService } from './slug.service';
 
 describe('UrlsService', () => {
   let service: UrlsService;
   let repository: Repository<Url>;
   let configService: ConfigService;
+  let slugService: SlugService;
 
   const mockUrl = {
     id: 'mock-uuid-1',
@@ -39,6 +40,11 @@ describe('UrlsService', () => {
     get: jest.fn().mockReturnValue('http://localhost:3000'),
   };
 
+  const mockSlugService = {
+    validateCustomAlias: jest.fn(),
+    generateUniqueSlug: jest.fn().mockResolvedValue('abc123'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -51,18 +57,19 @@ describe('UrlsService', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: SlugService,
+          useValue: mockSlugService,
+        },
       ],
     }).compile();
 
     service = module.get<UrlsService>(UrlsService);
     repository = module.get<Repository<Url>>(getRepositoryToken(Url));
     configService = module.get<ConfigService>(ConfigService);
+    slugService = module.get<SlugService>(SlugService);
 
     jest.clearAllMocks();
-  });
-
-  afterEach(() => {
-    service.onModuleDestroy();
   });
 
   describe('createShortUrl', () => {
@@ -152,9 +159,14 @@ describe('UrlsService', () => {
       };
       const userId = 'user-uuid-1';
 
-      mockRepository.findOne.mockResolvedValue(mockUrl);
+      const ConflictException = require('@nestjs/common').ConflictException;
+      mockSlugService.validateCustomAlias.mockRejectedValue(
+        new ConflictException('Este alias já está em uso')
+      );
 
-      await expect(service.createShortUrl(createUrlDto, userId)).rejects.toThrow();
+      await expect(service.createShortUrl(createUrlDto, userId)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 

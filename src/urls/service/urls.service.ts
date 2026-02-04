@@ -3,7 +3,6 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-  OnModuleDestroy,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
@@ -11,29 +10,24 @@ import { ConfigService } from '@nestjs/config';
 import { Url } from '../entity/urls.entity';
 import { CreateUrlDto } from '../dto/create-url.dto';
 import { UpdateUrlDto } from '../dto/update-url.dto';
-import { SlugGenerator } from '../helpers/slug-generator.helper';
+import { SlugService } from './slug.service';
 import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
-export class UrlsService implements OnModuleDestroy {
+export class UrlsService {
   private readonly baseUrl: string;
-  private readonly slugGenerator: SlugGenerator;
 
   constructor(
     @InjectRepository(Url)
     private readonly urlRepository: Repository<Url>,
     private readonly configService: ConfigService,
+    private readonly slugService: SlugService,
   ) {
     const baseUrl = this.configService.get<string>('BASE_URL');
     if (!baseUrl) {
       throw new Error('BASE_URL Não está definido na configuração');
     }
     this.baseUrl = baseUrl;
-    this.slugGenerator = new SlugGenerator();
-  }
-
-  onModuleDestroy() {
-    this.slugGenerator.destroy();
   }
 
   async createShortUrl(
@@ -62,9 +56,8 @@ export class UrlsService implements OnModuleDestroy {
           );
         }
 
-        await this.slugGenerator.validateCustomAlias(
+        await this.slugService.validateCustomAlias(
           createUrlDto.customAlias,
-          this.urlRepository,
         );
 
         slug = createUrlDto.customAlias.toLowerCase();
@@ -74,7 +67,7 @@ export class UrlsService implements OnModuleDestroy {
           userId,
         });
       } else {
-        slug = await this.slugGenerator.generateUniqueSlug(this.urlRepository);
+        slug = await this.slugService.generateUniqueSlug();
         Sentry.logger.debug('Generated automatic slug', { slug });
       }
 
@@ -86,8 +79,6 @@ export class UrlsService implements OnModuleDestroy {
       });
 
       const savedUrl = await this.urlRepository.save(url);
-
-      this.slugGenerator.addToCache(slug);
 
       Sentry.metrics.count('url_created', 1);
       if (isCustomAlias) {

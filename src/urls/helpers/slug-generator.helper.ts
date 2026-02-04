@@ -1,18 +1,7 @@
-import { ConflictException } from '@nestjs/common';
-import { Repository, IsNull } from 'typeorm';
-import { Url } from '../entity/urls.entity';
-
 export class SlugGenerator {
   private readonly SLUG_LENGTH = 6;
   private readonly SLUG_CHARS =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  private readonly RESERVED_SLUGS = [
-    'api',
-    'auth',
-    'docs',
-    'shorten',
-    'my-urls',
-  ];
 
   private readonly recentSlugsCache = new Set<string>();
   private readonly CACHE_MAX_SIZE = 10000;
@@ -27,13 +16,8 @@ export class SlugGenerator {
     }, this.CACHE_TTL);
   }
 
-
   destroy() {
     clearInterval(this.cacheCleanupTimer);
-  }
-
-  isReservedSlug(slug: string): boolean {
-    return this.RESERVED_SLUGS.includes(slug.toLowerCase());
   }
 
   addToCache(slug: string): void {
@@ -44,51 +28,7 @@ export class SlugGenerator {
     return this.recentSlugsCache.has(slug);
   }
 
-  async validateCustomAlias(
-    customAlias: string,
-    urlRepository: Repository<Url>,
-  ): Promise<void> {
-    if (this.isReservedSlug(customAlias)) {
-      throw new ConflictException('Este alias é uma rota reservada');
-    }
-
-    const existingAlias = await urlRepository.findOne({
-      where: { slug: customAlias.toLowerCase(), deletedAt: IsNull() },
-    });
-
-    if (existingAlias) {
-      throw new ConflictException('Este alias já está em uso');
-    }
-  }
-
-  async generateUniqueSlug(urlRepository: Repository<Url>): Promise<string> {
-    let slug = this.generateOptimizedSlug();
-
-    const existing = await urlRepository.findOne({
-      where: { slug },
-      select: ['id'],
-    });
-
-    if (!existing) {
-      return slug;
-    }
-
-    slug = this.generateRandomSlug();
-    const finalCheck = await urlRepository.findOne({
-      where: { slug },
-      select: ['id'],
-    });
-
-    if (!finalCheck) {
-      return slug;
-    }
-
-    throw new Error(
-      'Colisão extremamente rara detectada. Verifique o gerador de slugs.',
-    );
-  }
-
-  private generateOptimizedSlug(): string {
+  generateOptimizedSlug(): string {
     const timestamp = Date.now();
     const random = Math.random();
 
@@ -115,7 +55,7 @@ export class SlugGenerator {
     return slug;
   }
 
-  private generateRandomSlug(): string {
+  generateRandomSlug(): string {
     let slug = '';
     for (let i = 0; i < this.SLUG_LENGTH; i++) {
       const randomIndex = Math.floor(Math.random() * this.SLUG_CHARS.length);
