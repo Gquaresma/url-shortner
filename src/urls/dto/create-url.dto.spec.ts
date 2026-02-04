@@ -3,8 +3,8 @@ import { CreateUrlDto } from './create-url.dto';
 import { plainToClass } from 'class-transformer';
 
 describe('CreateUrlDto', () => {
-  describe('Validação de URL', () => {
-    it('deve passar com URL válida', async () => {
+  describe('URL Validation', () => {
+    it('should pass with valid URL', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
       });
@@ -14,7 +14,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve falhar com URL sem protocolo', async () => {
+    it('should fail with URL without protocol', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'www.example.com',
       });
@@ -25,7 +25,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve falhar com URL inválida', async () => {
+    it('should fail with invalid URL', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'not-a-url',
       });
@@ -36,7 +36,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve falhar com URL vazia', async () => {
+    it('should fail with empty URL', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: '',
       });
@@ -46,7 +46,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBeGreaterThan(0);
     });
 
-    it('deve falhar com URL muito longa (> 2048 caracteres)', async () => {
+    it('should fail with URL too long (> 2048 characters)', async () => {
       const longUrl = 'https://www.example.com/' + 'a'.repeat(2050);
       const dto = plainToClass(CreateUrlDto, {
         url: longUrl,
@@ -58,7 +58,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve aceitar URLs com http', async () => {
+    it('should accept URLs with http', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'http://www.example.com',
       });
@@ -68,7 +68,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar URLs com https', async () => {
+    it('should accept URLs with https', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
       });
@@ -79,8 +79,8 @@ describe('CreateUrlDto', () => {
     });
   });
 
-  describe('Validação de customAlias', () => {
-    it('deve ser opcional', async () => {
+  describe('customAlias Validation', () => {
+    it('should be optional', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
       });
@@ -90,7 +90,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve passar com alias válido', async () => {
+    it('should pass with valid alias', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'meu-link',
@@ -101,7 +101,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve falhar com alias muito curto (< 3 caracteres)', async () => {
+    it('should fail with alias too short (< 3 characters)', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'ab',
@@ -113,7 +113,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('customAlias');
     });
 
-    it('deve falhar com alias muito longo (> 30 caracteres)', async () => {
+    it('should fail with alias too long (> 30 characters)', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'a'.repeat(31),
@@ -125,7 +125,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('customAlias');
     });
 
-    it('deve falhar com alias contendo caracteres inválidos', async () => {
+    it('should fail with alias containing invalid characters', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'meu link!',
@@ -137,7 +137,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('customAlias');
     });
 
-    it('deve falhar com alias contendo letras maiúsculas', async () => {
+    it('should fail with alias containing uppercase letters', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'MeuLink',
@@ -149,7 +149,7 @@ describe('CreateUrlDto', () => {
       expect(errors[0].property).toBe('customAlias');
     });
 
-    it('deve aceitar alias com hífens', async () => {
+    it('should accept alias with hyphens', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'meu-link-aqui',
@@ -160,7 +160,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar alias com underscores', async () => {
+    it('should accept alias with underscores', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'meu_link_aqui',
@@ -171,7 +171,7 @@ describe('CreateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar alias com números', async () => {
+    it('should accept alias with numbers', async () => {
       const dto = plainToClass(CreateUrlDto, {
         url: 'https://www.example.com',
         customAlias: 'link123',

@@ -66,7 +66,7 @@ describe('UrlsService', () => {
   });
 
   describe('createShortUrl', () => {
-    it('deve criar uma URL encurtada com slug automático para usuário não autenticado', async () => {
+    it('should create a short URL with automatic slug for unauthenticated user', async () => {
       const createUrlDto = { url: 'https://www.example.com' };
 
       mockRepository.create.mockReturnValue(mockUrl);
@@ -92,7 +92,7 @@ describe('UrlsService', () => {
       expect(mockRepository.save).toHaveBeenCalled();
     });
 
-    it('deve criar uma URL encurtada com slug automático para usuário autenticado', async () => {
+    it('should create a short URL with automatic slug for authenticated user', async () => {
       const createUrlDto = { url: 'https://www.example.com' };
       const userId = 'user-uuid-1';
 
@@ -111,7 +111,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve criar uma URL com alias customizado para usuário autenticado', async () => {
+    it('should create a URL with custom alias for authenticated user', async () => {
       const createUrlDto = {
         url: 'https://www.example.com',
         customAlias: 'myalias'
@@ -119,7 +119,7 @@ describe('UrlsService', () => {
       const userId = 'user-uuid-1';
       const customUrl = { ...mockUrl, slug: 'myalias', isCustomAlias: true };
 
-      mockRepository.findOne.mockResolvedValue(null); // Alias disponível
+      mockRepository.findOne.mockResolvedValue(null);
       mockRepository.create.mockReturnValue(customUrl);
       mockRepository.save.mockResolvedValue(customUrl);
 
@@ -134,7 +134,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar BadRequestException quando alias customizado for usado sem autenticação', async () => {
+    it('should throw BadRequestException when custom alias is used without authentication', async () => {
       const createUrlDto = {
         url: 'https://www.example.com',
         customAlias: 'myalias'
@@ -145,21 +145,21 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar ConflictException quando alias customizado já estiver em uso', async () => {
+    it('should throw ConflictException when custom alias is already in use', async () => {
       const createUrlDto = {
         url: 'https://www.example.com',
         customAlias: 'myalias'
       };
       const userId = 'user-uuid-1';
 
-      mockRepository.findOne.mockResolvedValue(mockUrl); // Alias já existe
+      mockRepository.findOne.mockResolvedValue(mockUrl);
 
       await expect(service.createShortUrl(createUrlDto, userId)).rejects.toThrow();
     });
   });
 
   describe('findMyUrls', () => {
-    it('deve retornar todas as URLs do usuário', async () => {
+    it('should return all user URLs', async () => {
       const userId = 'user-uuid-1';
       const mockUrls = [mockUrl, { ...mockUrl, id: 'mock-uuid-2', slug: 'xyz789' }];
 
@@ -184,7 +184,7 @@ describe('UrlsService', () => {
       });
     });
 
-    it('deve retornar array vazio quando usuário não tiver URLs', async () => {
+    it('should return empty array when user has no URLs', async () => {
       const userId = 'user-uuid-1';
 
       mockRepository.find.mockResolvedValue([]);
@@ -196,7 +196,7 @@ describe('UrlsService', () => {
   });
 
   describe('updateUrl', () => {
-    it('deve atualizar a URL com sucesso', async () => {
+    it('should update URL successfully', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'user-uuid-1';
       const updateUrlDto = { url: 'https://www.new-example.com' };
@@ -215,7 +215,7 @@ describe('UrlsService', () => {
       expect(mockRepository.save).toHaveBeenCalled();
     });
 
-    it('deve lançar NotFoundException quando URL não existir', async () => {
+    it('should throw NotFoundException when URL does not exist', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'user-uuid-1';
       const updateUrlDto = { url: 'https://www.new-example.com' };
@@ -227,7 +227,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar ForbiddenException quando usuário não for o dono da URL', async () => {
+    it('should throw ForbiddenException when user is not the owner of the URL', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'different-user-uuid';
       const updateUrlDto = { url: 'https://www.new-example.com' };
@@ -241,7 +241,7 @@ describe('UrlsService', () => {
   });
 
   describe('deleteUrl', () => {
-    it('deve fazer soft delete da URL com sucesso', async () => {
+    it('should soft delete URL successfully', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'user-uuid-1';
 
@@ -257,7 +257,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar NotFoundException quando URL não existir', async () => {
+    it('should throw NotFoundException when URL does not exist', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'user-uuid-1';
 
@@ -268,7 +268,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar ForbiddenException quando usuário não for o dono da URL', async () => {
+    it('should throw ForbiddenException when user is not the owner of the URL', async () => {
       const urlId = 'mock-uuid-1';
       const userId = 'different-user-uuid';
 
@@ -281,7 +281,7 @@ describe('UrlsService', () => {
   });
 
   describe('redirectToOriginalUrl', () => {
-    it('deve retornar URL original e incrementar contador de acessos', async () => {
+    it('should return original URL and increment access counter', async () => {
       const slug = 'abc123';
       const urlWithIncrementedCount = { ...mockUrl, accessCount: 1 };
 
@@ -298,7 +298,7 @@ describe('UrlsService', () => {
       );
     });
 
-    it('deve lançar NotFoundException quando slug não existir', async () => {
+    it('should throw NotFoundException when slug does not exist', async () => {
       const slug = 'nonexistent';
 
       mockRepository.findOne.mockResolvedValue(null);

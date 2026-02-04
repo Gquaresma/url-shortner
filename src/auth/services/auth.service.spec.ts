@@ -9,7 +9,6 @@ import { User } from '../../users/entity/users.entity';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { LoginUserDto } from '../../users/dto/login-user.dto';
 
-// Mock do módulo bcrypt
 jest.mock('bcrypt');
 
 describe('AuthService', () => {

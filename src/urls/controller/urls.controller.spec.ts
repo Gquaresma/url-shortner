@@ -56,9 +56,12 @@ describe('UrlsController', () => {
   });
 
   describe('createShortUrl', () => {
-    it('deve criar uma URL encurtada sem autenticação', async () => {
+    it('should create a short URL without authentication', async () => {
       const createUrlDto: CreateUrlDto = { url: 'https://www.example.com' };
-      const req = {};
+      const req = {
+        headers: { 'user-agent': 'test-agent' },
+        ip: '127.0.0.1'
+      };
 
       mockUrlsService.createShortUrl.mockResolvedValue(mockShortUrl);
 
@@ -68,9 +71,13 @@ describe('UrlsController', () => {
       expect(service.createShortUrl).toHaveBeenCalledWith(createUrlDto, undefined);
     });
 
-    it('deve criar uma URL encurtada com autenticação', async () => {
+    it('should create a short URL with authentication', async () => {
       const createUrlDto: CreateUrlDto = { url: 'https://www.example.com' };
-      const req = { user: mockUser };
+      const req = {
+        user: mockUser,
+        headers: { 'user-agent': 'test-agent' },
+        ip: '127.0.0.1'
+      };
 
       mockUrlsService.createShortUrl.mockResolvedValue(mockShortUrl);
 
@@ -80,12 +87,16 @@ describe('UrlsController', () => {
       expect(service.createShortUrl).toHaveBeenCalledWith(createUrlDto, mockUser.id);
     });
 
-    it('deve criar uma URL com alias customizado', async () => {
+    it('should create a URL with custom alias', async () => {
       const createUrlDto: CreateUrlDto = {
         url: 'https://www.example.com',
         customAlias: 'myalias'
       };
-      const req = { user: mockUser };
+      const req = {
+        user: mockUser,
+        headers: { 'user-agent': 'test-agent' },
+        ip: '127.0.0.1'
+      };
       const customShortUrl = { ...mockShortUrl, slug: 'myalias' };
 
       mockUrlsService.createShortUrl.mockResolvedValue(customShortUrl);
@@ -98,7 +109,7 @@ describe('UrlsController', () => {
   });
 
   describe('getMyUrls', () => {
-    it('deve retornar todas as URLs do usuário', async () => {
+    it('should return all user URLs', async () => {
       const mockUrls = [
         mockShortUrl,
         { ...mockShortUrl, id: 'mock-uuid-2', slug: 'xyz789' },
@@ -112,7 +123,7 @@ describe('UrlsController', () => {
       expect(service.findMyUrls).toHaveBeenCalledWith(mockUser.id);
     });
 
-    it('deve retornar array vazio quando usuário não tiver URLs', async () => {
+    it('should return empty array when user has no URLs', async () => {
       mockUrlsService.findMyUrls.mockResolvedValue([]);
 
       const result = await controller.getMyUrls(mockUser);
@@ -123,7 +134,7 @@ describe('UrlsController', () => {
   });
 
   describe('updateUrl', () => {
-    it('deve atualizar uma URL com sucesso', async () => {
+    it('should update a URL successfully', async () => {
       const urlId = 'mock-uuid-1';
       const updateUrlDto: UpdateUrlDto = { url: 'https://www.new-example.com' };
       const updatedUrl = { ...mockShortUrl, originalUrl: updateUrlDto.url };
@@ -138,7 +149,7 @@ describe('UrlsController', () => {
   });
 
   describe('deleteUrl', () => {
-    it('deve deletar uma URL com sucesso', async () => {
+    it('should delete a URL successfully', async () => {
       const urlId = 'mock-uuid-1';
 
       mockUrlsService.deleteUrl.mockResolvedValue(undefined);

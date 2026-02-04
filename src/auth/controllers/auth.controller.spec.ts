@@ -40,7 +40,7 @@ describe('AuthController', () => {
   });
 
   describe('register', () => {
-    it('deve registrar um novo usuário com sucesso', async () => {
+    it('should register a new user successfully', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
         password: 'password123',
@@ -54,7 +54,7 @@ describe('AuthController', () => {
       expect(service.register).toHaveBeenCalledWith(createUserDto);
     });
 
-    it('deve lançar ConflictException quando email já estiver em uso', async () => {
+    it('should throw ConflictException when email is already in use', async () => {
       const createUserDto: CreateUserDto = {
         email: 'existing@example.com',
         password: 'password123',
@@ -70,7 +70,7 @@ describe('AuthController', () => {
       expect(service.register).toHaveBeenCalledWith(createUserDto);
     });
 
-    it('deve retornar token JWT e dados do usuário após registro', async () => {
+    it('should return JWT token and user data after registration', async () => {
       const createUserDto: CreateUserDto = {
         email: 'newuser@example.com',
         password: 'password123',
@@ -87,7 +87,7 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('deve fazer login com credenciais válidas', async () => {
+    it('should login with valid credentials', async () => {
       const loginUserDto: LoginUserDto = {
         email: 'test@example.com',
         password: 'password123',
@@ -101,7 +101,7 @@ describe('AuthController', () => {
       expect(service.login).toHaveBeenCalledWith(loginUserDto);
     });
 
-    it('deve lançar UnauthorizedException com credenciais inválidas', async () => {
+    it('should throw UnauthorizedException with invalid credentials', async () => {
       const loginUserDto: LoginUserDto = {
         email: 'test@example.com',
         password: 'wrongpassword',
@@ -117,7 +117,7 @@ describe('AuthController', () => {
       expect(service.login).toHaveBeenCalledWith(loginUserDto);
     });
 
-    it('deve retornar token JWT e dados do usuário após login bem-sucedido', async () => {
+    it('should return JWT token and user data after successful login', async () => {
       const loginUserDto: LoginUserDto = {
         email: 'test@example.com',
         password: 'password123',
@@ -135,7 +135,7 @@ describe('AuthController', () => {
       });
     });
 
-    it('deve lançar UnauthorizedException quando usuário não existir', async () => {
+    it('should throw UnauthorizedException when user does not exist', async () => {
       const loginUserDto: LoginUserDto = {
         email: 'nonexistent@example.com',
         password: 'password123',

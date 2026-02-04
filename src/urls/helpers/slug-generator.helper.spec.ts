@@ -19,7 +19,7 @@ describe('SlugGenerator', () => {
   });
 
   describe('isReservedSlug', () => {
-    it('deve retornar true para slugs reservados', () => {
+    it('should return true for reserved slugs', () => {
       expect(slugGenerator.isReservedSlug('api')).toBe(true);
       expect(slugGenerator.isReservedSlug('auth')).toBe(true);
       expect(slugGenerator.isReservedSlug('docs')).toBe(true);
@@ -27,13 +27,13 @@ describe('SlugGenerator', () => {
       expect(slugGenerator.isReservedSlug('my-urls')).toBe(true);
     });
 
-    it('deve retornar true para slugs reservados em maiúsculas', () => {
+    it('should return true for reserved slugs in uppercase', () => {
       expect(slugGenerator.isReservedSlug('API')).toBe(true);
       expect(slugGenerator.isReservedSlug('AUTH')).toBe(true);
       expect(slugGenerator.isReservedSlug('DOCS')).toBe(true);
     });
 
-    it('deve retornar false para slugs não reservados', () => {
+    it('should return false for non-reserved slugs', () => {
       expect(slugGenerator.isReservedSlug('myslug')).toBe(false);
       expect(slugGenerator.isReservedSlug('abc123')).toBe(false);
       expect(slugGenerator.isReservedSlug('custom')).toBe(false);
@@ -41,7 +41,7 @@ describe('SlugGenerator', () => {
   });
 
   describe('cache operations', () => {
-    it('deve adicionar slug ao cache', () => {
+    it('should add slug to cache', () => {
       const slug = 'test123';
 
       slugGenerator.addToCache(slug);
@@ -49,7 +49,7 @@ describe('SlugGenerator', () => {
       expect(slugGenerator.isInCache(slug)).toBe(true);
     });
 
-    it('deve verificar se slug está no cache', () => {
+    it('should check if slug is in cache', () => {
       const slug = 'test456';
 
       expect(slugGenerator.isInCache(slug)).toBe(false);
@@ -59,7 +59,7 @@ describe('SlugGenerator', () => {
       expect(slugGenerator.isInCache(slug)).toBe(true);
     });
 
-    it('deve manter múltiplos slugs no cache', () => {
+    it('should keep multiple slugs in cache', () => {
       const slugs = ['slug1', 'slug2', 'slug3'];
 
       slugs.forEach(slug => slugGenerator.addToCache(slug));
@@ -71,7 +71,7 @@ describe('SlugGenerator', () => {
   });
 
   describe('validateCustomAlias', () => {
-    it('deve lançar ConflictException para slug reservado', async () => {
+    it('should throw ConflictException for reserved slug', async () => {
       await expect(
         slugGenerator.validateCustomAlias('api', mockRepository as Repository<Url>),
       ).rejects.toThrow(ConflictException);
@@ -81,7 +81,7 @@ describe('SlugGenerator', () => {
       ).rejects.toThrow('Este alias é uma rota reservada');
     });
 
-    it('deve lançar ConflictException quando alias já existir no banco', async () => {
+    it('should throw ConflictException when alias already exists in database', async () => {
       const existingUrl = {
         id: 'uuid-1',
         slug: 'myalias',
@@ -100,7 +100,7 @@ describe('SlugGenerator', () => {
       ).rejects.toThrow('Este alias já está em uso');
     });
 
-    it('deve passar validação para alias válido e disponível', async () => {
+    it('should pass validation for valid and available alias', async () => {
       (mockRepository.findOne as jest.Mock).mockResolvedValue(null);
 
       await expect(
@@ -110,7 +110,7 @@ describe('SlugGenerator', () => {
       expect(mockRepository.findOne).toHaveBeenCalled();
     });
 
-    it('deve converter alias para lowercase antes de validar', async () => {
+    it('should convert alias to lowercase before validating', async () => {
       (mockRepository.findOne as jest.Mock).mockResolvedValue(null);
 
       await slugGenerator.validateCustomAlias('MyAlias', mockRepository as Repository<Url>);
@@ -122,7 +122,7 @@ describe('SlugGenerator', () => {
   });
 
   describe('generateUniqueSlug', () => {
-    it('deve gerar um slug único de 6 caracteres', async () => {
+    it('should generate a unique slug with 6 characters', async () => {
       (mockRepository.findOne as jest.Mock).mockResolvedValue(null);
 
       const slug = await slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>);
@@ -132,7 +132,7 @@ describe('SlugGenerator', () => {
       expect(mockRepository.findOne).toHaveBeenCalled();
     });
 
-    it('deve gerar slug contendo apenas caracteres válidos', async () => {
+    it('should generate slug containing only valid characters', async () => {
       (mockRepository.findOne as jest.Mock).mockResolvedValue(null);
 
       const slug = await slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>);
@@ -141,10 +141,10 @@ describe('SlugGenerator', () => {
       expect(validChars.test(slug)).toBe(true);
     });
 
-    it('deve gerar novo slug quando primeiro já existir', async () => {
+    it('should generate new slug when first one already exists', async () => {
       (mockRepository.findOne as jest.Mock)
-        .mockResolvedValueOnce({ id: 'uuid-1', slug: 'abc123' }) // Primeira tentativa: existe
-        .mockResolvedValueOnce(null); // Segunda tentativa: disponível
+        .mockResolvedValueOnce({ id: 'uuid-1', slug: 'abc123' }) 
+        .mockResolvedValueOnce(null);
 
       const slug = await slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>);
 
@@ -152,33 +152,32 @@ describe('SlugGenerator', () => {
       expect(mockRepository.findOne).toHaveBeenCalledTimes(2);
     });
 
-    it('deve lançar erro quando houver colisão extremamente rara', async () => {
+    it('should throw error when there is an extremely rare collision', async () => {
       (mockRepository.findOne as jest.Mock)
-        .mockResolvedValueOnce({ id: 'uuid-1' }) // Primeira tentativa: existe
-        .mockResolvedValueOnce({ id: 'uuid-2' }); // Segunda tentativa: também existe
+        .mockResolvedValueOnce({ id: 'uuid-1' }) 
+        .mockResolvedValueOnce({ id: 'uuid-2' }); 
 
       await expect(
         slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>),
       ).rejects.toThrow('Colisão extremamente rara detectada');
     });
 
-    it('deve gerar slugs diferentes em chamadas consecutivas', async () => {
+    it('should generate different slugs in consecutive calls', async () => {
       (mockRepository.findOne as jest.Mock).mockResolvedValue(null);
 
       const slug1 = await slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>);
       const slug2 = await slugGenerator.generateUniqueSlug(mockRepository as Repository<Url>);
 
-      // Nota: existe uma chance muito pequena de colisão, mas é extremamente improvável
       expect(slug1).not.toBe(slug2);
     });
   });
 
   describe('destroy', () => {
-    it('deve limpar timer de cache sem erros', () => {
+    it('should clear cache timer without errors', () => {
       expect(() => slugGenerator.destroy()).not.toThrow();
     });
 
-    it('deve permitir destruir múltiplas vezes', () => {
+    it('should allow destroying multiple times', () => {
       slugGenerator.destroy();
       expect(() => slugGenerator.destroy()).not.toThrow();
     });

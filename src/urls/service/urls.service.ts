@@ -89,7 +89,6 @@ export class UrlsService implements OnModuleDestroy {
 
       this.slugGenerator.addToCache(slug);
 
-      // Increment metrics
       Sentry.metrics.count('url_created', 1);
       if (isCustomAlias) {
         Sentry.metrics.count('url_custom_alias_created', 1);

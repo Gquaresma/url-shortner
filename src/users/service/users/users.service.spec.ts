@@ -39,7 +39,7 @@ describe('UsersService', () => {
   });
 
   describe('findByEmail', () => {
-    it('deve retornar um usuário quando email existir', async () => {
+    it('should return a user when email exists', async () => {
       const email = 'test@example.com';
       mockRepository.findOne.mockResolvedValue(mockUser);
 
@@ -51,7 +51,7 @@ describe('UsersService', () => {
       });
     });
 
-    it('deve retornar null quando email não existir', async () => {
+    it('should return null when email does not exist', async () => {
       const email = 'nonexistent@example.com';
       mockRepository.findOne.mockResolvedValue(null);
 
@@ -65,7 +65,7 @@ describe('UsersService', () => {
   });
 
   describe('findById', () => {
-    it('deve retornar um usuário quando id existir', async () => {
+    it('should return a user when id exists', async () => {
       const userId = 'user-uuid-1';
       const { password, ...userWithoutPassword } = mockUser;
 
@@ -80,7 +80,7 @@ describe('UsersService', () => {
       });
     });
 
-    it('deve retornar null quando id não existir', async () => {
+    it('should return null when id does not exist', async () => {
       const userId = 'nonexistent-uuid';
       mockRepository.findOne.mockResolvedValue(null);
 
@@ -93,7 +93,7 @@ describe('UsersService', () => {
       });
     });
 
-    it('não deve retornar a senha do usuário', async () => {
+    it('should not return user password', async () => {
       const userId = 'user-uuid-1';
       const userWithoutPassword = {
         id: mockUser.id,

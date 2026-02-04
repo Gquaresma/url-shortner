@@ -13,12 +13,12 @@ describe('JwtAuthGuard', () => {
     guard = module.get<JwtAuthGuard>(JwtAuthGuard);
   });
 
-  it('deve estar definido', () => {
+  it('should be defined', () => {
     expect(guard).toBeDefined();
   });
 
   describe('canActivate', () => {
-    it('deve retornar true para requisição autenticada', async () => {
+    it('should return true for authenticated request', async () => {
       const mockExecutionContext = {
         switchToHttp: () => ({
           getRequest: () => ({
@@ -30,7 +30,6 @@ describe('JwtAuthGuard', () => {
         }),
       } as ExecutionContext;
 
-      // Mock do método canActivate da superclasse
       jest.spyOn(guard, 'canActivate').mockResolvedValue(true);
 
       const result = await guard.canActivate(mockExecutionContext);
@@ -40,7 +39,7 @@ describe('JwtAuthGuard', () => {
   });
 
   describe('handleRequest', () => {
-    it('deve retornar usuário quando autenticação for bem-sucedida', () => {
+    it('should return user when authentication is successful', () => {
       const user = { id: 'user-uuid-1', email: 'test@example.com' };
       const info = null;
       const context = {} as ExecutionContext;
@@ -50,7 +49,7 @@ describe('JwtAuthGuard', () => {
       expect(result).toEqual(user);
     });
 
-    it('deve lançar UnauthorizedException quando não houver usuário', () => {
+    it('should throw UnauthorizedException when there is no user', () => {
       const info = null;
       const context = {} as ExecutionContext;
 
@@ -59,7 +58,7 @@ describe('JwtAuthGuard', () => {
       );
     });
 
-    it('deve lançar erro quando houver erro na autenticação', () => {
+    it('should throw error when there is an authentication error', () => {
       const error = new Error('Token inválido');
       const info = null;
       const context = {} as ExecutionContext;

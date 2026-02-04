@@ -3,8 +3,8 @@ import { UpdateUrlDto } from './update-url.dto';
 import { plainToClass } from 'class-transformer';
 
 describe('UpdateUrlDto', () => {
-  describe('Validação de URL', () => {
-    it('deve passar com URL válida', async () => {
+  describe('URL Validation', () => {
+    it('should pass with valid URL', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'https://www.example.com',
       });
@@ -14,7 +14,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve falhar com URL sem protocolo', async () => {
+    it('should fail with URL without protocol', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'www.example.com',
       });
@@ -25,7 +25,7 @@ describe('UpdateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve falhar com URL inválida', async () => {
+    it('should fail with invalid URL', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'not-a-url',
       });
@@ -36,7 +36,7 @@ describe('UpdateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve falhar com URL vazia', async () => {
+    it('should fail with empty URL', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: '',
       });
@@ -46,7 +46,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBeGreaterThan(0);
     });
 
-    it('deve falhar com URL muito longa (> 2048 caracteres)', async () => {
+    it('should fail with URL too long (> 2048 characters)', async () => {
       const longUrl = 'https://www.example.com/' + 'a'.repeat(2050);
       const dto = plainToClass(UpdateUrlDto, {
         url: longUrl,
@@ -58,7 +58,7 @@ describe('UpdateUrlDto', () => {
       expect(errors[0].property).toBe('url');
     });
 
-    it('deve aceitar URLs com http', async () => {
+    it('should accept URLs with http', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'http://www.example.com',
       });
@@ -68,7 +68,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar URLs com https', async () => {
+    it('should accept URLs with https', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'https://www.example.com',
       });
@@ -78,7 +78,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar URLs com path complexo', async () => {
+    it('should accept URLs with complex path', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'https://www.example.com/path/to/page?query=value&another=param#section',
       });
@@ -88,7 +88,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar URLs com subdomínios', async () => {
+    it('should accept URLs with subdomains', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'https://subdomain.example.com',
       });
@@ -98,7 +98,7 @@ describe('UpdateUrlDto', () => {
       expect(errors.length).toBe(0);
     });
 
-    it('deve aceitar URLs com portas', async () => {
+    it('should accept URLs with ports', async () => {
       const dto = plainToClass(UpdateUrlDto, {
         url: 'https://www.example.com:8080',
       });

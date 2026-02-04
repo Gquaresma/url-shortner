@@ -25,7 +25,6 @@ describe('JwtStrategy', () => {
   };
 
   beforeEach(async () => {
-    // Limpar mocks antes de criar o módulo
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
@@ -48,11 +47,10 @@ describe('JwtStrategy', () => {
 
   describe('validate', () => {
     beforeEach(() => {
-      // Limpar mocks apenas para os métodos de validação, não para o construtor
       mockAuthService.validateUser.mockClear();
     });
 
-    it('deve retornar usuário quando payload for válido', async () => {
+    it('should return user when payload is valid', async () => {
       const payload = { sub: 'user-uuid-1', email: 'test@example.com' };
 
       mockAuthService.validateUser.mockResolvedValue(mockUser);
@@ -63,7 +61,7 @@ describe('JwtStrategy', () => {
       expect(authService.validateUser).toHaveBeenCalledWith(payload);
     });
 
-    it('deve lançar UnauthorizedException quando usuário não for encontrado', async () => {
+    it('should throw UnauthorizedException when user is not found', async () => {
       const payload = { sub: 'nonexistent-uuid', email: 'test@example.com' };
 
       mockAuthService.validateUser.mockRejectedValue(
@@ -77,8 +75,7 @@ describe('JwtStrategy', () => {
   });
 
   describe('constructor', () => {
-    it('deve usar a secret key do ConfigService', () => {
-      // Verificar se getOrThrow foi chamado durante a construção
+    it('should use secret key from ConfigService', () => {
       expect(mockConfigService.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
     });
   });
