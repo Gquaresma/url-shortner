@@ -1,0 +1,251 @@
+### Variáveis
+@baseUrl = http://localhost:3000/api
+@token = seu_token_aqui
+@urlId = id_da_url_aqui
+@tenantId = id_do_tenant_aqui
+@tenantSlug = default
+
+### ========================================
+### 📚 DOCUMENTAÇÃO SWAGGER
+### ========================================
+### Acesse: http://localhost:3000/api/docs
+### Veja também: SWAGGER_QUICKSTART.md e SWAGGER_GUIDE.md
+### Para Multitenant: MULTITENANT.md
+
+### ========================================
+### 🏢 MULTITENANT
+### ========================================
+
+### 1. Criar novo Tenant
+POST {{baseUrl}}/tenants
+Content-Type: application/json
+
+{
+  "name": "Acme Corporation",
+  "slug": "acme-corp",
+  "domain": "acme.example.com"
+}
+
+### 2. Listar todos os Tenants
+GET {{baseUrl}}/tenants
+Authorization: Bearer {{token}}
+
+### 3. Buscar Tenant por ID
+GET {{baseUrl}}/tenants/{{tenantId}}
+Authorization: Bearer {{token}}
+
+### 4. Desativar Tenant
+PATCH {{baseUrl}}/tenants/{{tenantId}}/deactivate
+Authorization: Bearer {{token}}
+
+### 5. Ativar Tenant
+PATCH {{baseUrl}}/tenants/{{tenantId}}/activate
+Authorization: Bearer {{token}}
+
+### ========================================
+### AUTENTICAÇÃO
+### ========================================
+
+### 6. Registrar novo usuário (com tenant)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "email": "usuario@example.com",
+  "password": "Senha@Forte123"
+}
+
+### 7. Login (com tenant)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "email": "usuario@example.com",
+  "password": "Senha@Forte123"
+}
+
+### 8. Obter perfil do usuário autenticado
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+### ========================================
+### ENCURTAMENTO DE URLs
+### ========================================
+
+### 9. Encurtar URL (SEM autenticação - slug automático)
+POST {{baseUrl}}/shorten
+Content-Type: application/json
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "url": "https://teddy360.com.br/material/marco-legal-das-garantias-sancionado-entenda-o-que-muda/"
+}
+
+### 10. Encurtar URL (COM autenticação - slug automático)
+POST {{baseUrl}}/shorten
+Content-Type: application/json
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "url": "https://www.example.com/long-url-here"
+}
+
+### 11. Encurtar URL com alias customizado (requer autenticação)
+POST {{baseUrl}}/shorten
+Content-Type: application/json
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "url": "https://www.example.com/my-custom-page",
+  "customAlias": "meu-link"
+}
+
+### ========================================
+### GERENCIAMENTO DE URLs (Autenticado)
+### ========================================
+
+### 12. Listar minhas URLs
+GET {{baseUrl}}/my-urls
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+### 13. Atualizar URL original
+PUT {{baseUrl}}/my-urls/{{urlId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+{
+  "url": "https://www.example.com/new-destination"
+}
+
+### 14. Deletar URL (soft delete)
+DELETE {{baseUrl}}/my-urls/{{urlId}}
+Authorization: Bearer {{token}}
+X-Tenant-Slug: {{tenantSlug}}
+
+### ========================================
+### REDIRECIONAMENTO
+### ========================================
+
+### 15. Acessar URL encurtada (será redirecionado)
+GET http://localhost:3000/aZbKq7
+X-Tenant-Slug: {{tenantSlug}}
+
+### 16. Acessar alias customizado
+GET http://localhost:3000/meu-link
+X-Tenant-Slug: {{tenantSlug}}
+
+### ========================================
+### 🧪 TESTE MULTITENANT
+### ========================================
+
+### 17. Criar Tenant A
+POST {{baseUrl}}/tenants
+Content-Type: application/json
+
+{
+  "name": "Empresa A",
+  "slug": "empresa-a"
+}
+
+### 18. Criar Tenant B
+POST {{baseUrl}}/tenants
+Content-Type: application/json
+
+{
+  "name": "Empresa B",
+  "slug": "empresa-b"
+}
+
+### 19. Registrar usuário no Tenant A
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+X-Tenant-Slug: empresa-a
+
+{
+  "email": "joao@email.com",
+  "password": "senha123"
+}
+
+### 20. Registrar mesmo usuário no Tenant B (permitido!)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+X-Tenant-Slug: empresa-b
+
+{
+  "email": "joao@email.com",
+  "password": "senha456"
+}
+
+### ========================================
+### TESTES DE VALIDAÇÃO - Deve Falhar
+### ========================================
+
+### Email inválido
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "email-invalido",
+  "password": "Senha@Forte123"
+}
+
+### Senha fraca (sem maiúscula)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teste@example.com",
+  "password": "senha@fraca123"
+}
+
+### Senha fraca (sem caractere especial)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teste@example.com",
+  "password": "SenhaFraca123"
+}
+
+### Senha muito curta
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teste@example.com",
+  "password": "Sh@rt1"
+}
+
+### Campo extra não permitido
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "teste@example.com",
+  "password": "Senha@Forte123",
+  "campoExtra": "não permitido"
+}
+
+### Sem token (deve falhar)
+GET {{baseUrl}}/auth/profile
+
+### Token inválido (deve falhar)
+GET {{baseUrl}}/auth/profile
+Authorization: Bearer token_invalido_aqui
+
+### Credenciais incorretas
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "usuario@example.com",
+  "password": "SenhaErrada@123"
+}
+

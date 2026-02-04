@@ -39,8 +39,8 @@ async function bootstrap() {
     .setTitle('URL Shortener API')
     .setDescription('API para encurtamento de URLs com sistema de autenticação e gerenciamento de links personalizados')
     .setVersion('1.0')
-    .addTag('auth', 'Endpoints de autenticação')
-    .addTag('urls', 'Endpoints de gerenciamento de URLs')
+    .addTag('Auth', 'Endpoints de autenticação')
+    .addTag('URL', 'Endpoints de gerenciamento de URLs')
     .addBearerAuth(
       {
         type: 'http',
