@@ -1,7 +1,7 @@
 import { SlugGenerator } from './slug-generator.helper';
 import { ConflictException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Url } from '../../entities/urls/urls.entity';
+import { Url } from '../entity/urls.entity';
 
 describe('SlugGenerator', () => {
   let slugGenerator: SlugGenerator;

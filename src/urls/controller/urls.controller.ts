@@ -20,7 +20,7 @@ import { CreateUrlDto } from '../dto/create-url.dto';
 import { UpdateUrlDto } from '../dto/update-url.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
-import { User } from '../../entities/users/users.entity';
+import { User } from '../../users/entity/users.entity';
 import * as Sentry from '@sentry/nestjs';
 
 @ApiTags('URL')

@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { UnauthorizedException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import { User } from '../../entities/users/users.entity';
+import { User } from '../../users/entity/users.entity';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 import { LoginUserDto } from '../../users/dto/login-user.dto';
 

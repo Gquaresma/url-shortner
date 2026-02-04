@@ -1,6 +1,6 @@
 import { ConflictException } from '@nestjs/common';
 import { Repository, IsNull } from 'typeorm';
-import { Url } from '../../entities/urls/urls.entity';
+import { Url } from '../entity/urls.entity';
 
 export class SlugGenerator {
   private readonly SLUG_LENGTH = 6;

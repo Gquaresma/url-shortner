@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm';
-import { Url } from '../urls/urls.entity';
+import { Url } from '../../urls/entity/urls.entity';
 
 @Entity({ name: 'users' })
 export class User {

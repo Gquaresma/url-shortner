@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UrlsService } from './urls.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { Url } from '../../entities/urls/urls.entity';
+import { Url } from '../entity/urls.entity';
 import { Repository } from 'typeorm';
 import {
   BadRequestException,

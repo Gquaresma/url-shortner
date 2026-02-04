@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { Url } from '../../entities/urls/urls.entity';
+import { Url } from '../entity/urls.entity';
 import { CreateUrlDto } from '../dto/create-url.dto';
 import { UpdateUrlDto } from '../dto/update-url.dto';
 import { SlugGenerator } from '../helpers/slug-generator.helper';
